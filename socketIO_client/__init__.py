@@ -81,6 +81,9 @@ class EngineIO(LoggingMixin):
                 break
             except (TimeoutError, ConnectionError) as e:
                 if not self._wait_for_connection:
+                    # close at __init__ after _transport is called.
+                    # If not, memory leak of the heartbeat thread
+                    self._close()
                     raise
                 warning = Exception('[waiting for connection] %s' % e)
                 warning_screen.throw(warning)
